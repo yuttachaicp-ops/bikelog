@@ -33,8 +33,9 @@ button,input,select,textarea{font:inherit;color:inherit}
 
 header{background:var(--navy);color:#fff;padding:calc(14px + env(safe-area-inset-top)) 0 18px;position:sticky;top:0;z-index:5}
 header .wrap{display:flex;align-items:center;gap:12px}
-header h1{font-size:18px;margin:0;font-weight:600;line-height:1.2}
-header small{display:block;opacity:.7;font-size:12.5px;font-weight:400}
+header .ttl{flex:1;min-width:0}
+header h1{font-size:18px;margin:0;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header small{display:block;opacity:.7;font-size:12.5px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hbtn{margin-left:auto;background:rgba(255,255,255,.1);border:0;border-radius:12px;width:40px;height:40px;display:grid;place-items:center;color:#fff;cursor:pointer}
 .hbtn.sync.ok{color:#5BE3A0}.hbtn.sync.syncing{color:var(--amber)}.hbtn.sync.err,.hbtn.sync.offline{color:#FF8A8F}.hbtn.sync.off{color:rgba(255,255,255,.55)}
 .logo{width:40px;height:40px;border-radius:12px;background:var(--amber);color:var(--navy);display:grid;place-items:center}
@@ -91,6 +92,7 @@ main{padding-top:14px}
 .empty{text-align:center;padding:26px 10px;color:var(--muted)}
 .empty .tile{margin:0 auto 10px;width:52px;height:52px}
 .hint{background:var(--amber-soft);border-radius:12px;padding:10px 12px;font-size:13px;margin-bottom:12px;display:flex;gap:8px}
+.docbtns{display:flex;flex-wrap:wrap;gap:6px;width:100%;padding-left:54px}.docbtns .btn{white-space:nowrap;padding:7px 10px}
 .month{font-size:12.5px;font-weight:600;color:var(--muted);margin:14px 0 2px}
 
 .chart{display:flex;align-items:flex-end;gap:8px;height:130px;padding-top:6px}
@@ -128,7 +130,8 @@ dialog form{display:flex;flex-direction:column;max-height:92vh}
 .chk input{width:20px;height:20px;accent-color:var(--navy)}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chips label{display:flex;align-items:center;gap:6px;padding:6px 10px;border:1.5px solid var(--line);border-radius:20px;font-size:13px;cursor:pointer}
-.chips input{accent-color:var(--navy)}
+.f .chips input{width:auto;padding:0;margin:0;accent-color:var(--navy)}
+.chips label{margin:0;color:var(--text)}
 .chips label:has(input:checked){border-color:var(--amber);background:var(--amber-soft)}
 .calc{font-size:13px;color:var(--muted);margin:-4px 0 10px}
 
@@ -141,9 +144,9 @@ dialog form{display:flex;flex-direction:column;max-height:92vh}
 <header>
   <div class="wrap">
     <div class="logo" id="logo"></div>
-    <div><h1 id="bikeName">สมุดดูแลรถ</h1><small id="bikeSub"></small></div>
-    <button class="hbtn sync" data-act="syncTap" aria-label="สถานะซิงก์" id="syncBtn" style="margin-left:auto"></button>
-    <button class="hbtn" data-act="settings" aria-label="ตั้งค่า" id="setBtn" style="margin-left:0"></button>
+    <div class="ttl"><h1 id="bikeName">สมุดดูแลรถ</h1><small id="bikeSub"></small></div>
+    <button class="hbtn sync" data-act="syncTap" aria-label="สถานะซิงก์" id="syncBtn" style="margin-left:0;flex:none"></button>
+    <button class="hbtn" data-act="settings" aria-label="ตั้งค่า" id="setBtn" style="margin-left:0;flex:none"></button>
   </div>
 </header>
 
@@ -327,10 +330,11 @@ function renderHeader(){
   $('#bikeName').textContent=S.bike.name||'สมุดดูแลรถ';
   $('#bikeSub').textContent=[S.bike.plate,S.bike.year?'ปี '+S.bike.year:''].filter(Boolean).join(' · ')||'สมุดดูแลรถ';
 }
+let shownTab=null;
 function render(){
   renderHeader();renderTabs();
   $('#view').innerHTML=({home:vHome,fuel:vFuel,maint:vMaint,logs:vLogs,docs:vDocs})[tab]();
-  window.scrollTo(0,0);
+  if(shownTab!==tab){window.scrollTo(0,0);shownTab=tab}
 }
 const tileCls=l=>l==='over'?'over':l==='soon'?'soon':'';
 
@@ -343,6 +347,7 @@ function vHome(){
     <button class="btn" data-act="addFuel"><span class="tile">${ic('fuel','sm')}</span>เติมน้ำมัน</button>
     <button class="btn" data-act="addLog"><span class="tile">${ic('wrench','sm')}</span>บันทึกซ่อม</button>
   </div>`;
+  if(!S.setup)h+=`<div class="hint">${ic('bike','sm')}<div style="flex:1">ยังไม่ได้ตั้งค่ารถครั้งแรก</div><button class="btn sm primary" data-act="setup">ตั้งค่า</button></div>`;
   if(deferredInstall)h+=`<div class="hint">${ic('install','sm')}<div style="flex:1">ติดตั้งเป็นแอพบนหน้าจอหลัก จะเปิดได้เร็วและใช้ได้แม้ไม่มีเน็ต</div><button class="btn sm primary" data-act="install">ติดตั้ง</button></div>`;
   if('Notification' in window&&Notification.permission==='default')h+=`<div class="hint">${ic('bell','sm')}<div style="flex:1">เปิดการแจ้งเตือน ให้แอพเตือนเมื่อถึงรอบเปลี่ยนอะไหล่หรือใกล้ต่อ พ.ร.บ./ภาษี</div><button class="btn sm primary" data-act="notif">เปิด</button></div>`;
   h+=`<div class="card"><h2>${ic('alert','sm')}ต้องดูแล ${a.length?`<span class="badge over">${a.length}</span>`:''}</h2>`;
@@ -401,7 +406,7 @@ function vLogs(){
 function vDocs(){
   let h=`<div class="card"><h2>${ic('doc','sm')}เอกสารและวันหมดอายุ<button class="btn sm primary act" data-act="addDoc">${ic('plus','sm')}เพิ่ม</button></h2><div class="list">`;
   h+=S.docs.map(d=>{const s=docStatus(d);return`<div class="item" style="cursor:default;flex-wrap:wrap"><span class="tile ${tileCls(s.level)}">${ic(d.icon)}</span><span class="body"><span class="t">${esc(d.name)}</span><span class="s">${d.expiry?`หมดอายุ ${fmtDate(d.expiry)}`:''}${d.note?` · ${esc(d.note)}`:''}</span></span><span class="badge ${s.level==='none'?'gray':s.level}">${s.text}</span>
-    <div style="display:flex;gap:6px;width:100%;padding-left:54px">
+    <div class="docbtns">
       <button class="btn sm" data-act="renewDoc" data-id="${d.id}">${ic('check','sm')}ต่ออายุแล้ว</button>
       <button class="btn sm" data-act="editDoc" data-id="${d.id}">แก้ไข</button>
       ${d.expiry?`<a class="btn sm ghost" target="_blank" rel="noopener" href="${gcal(d)}">${ic('calendar','sm')}ลงปฏิทิน</a>`:''}
@@ -414,20 +419,22 @@ function gcal(d){
 }
 
 /* ---------- Bottom sheet ---------- */
-const dlg=$('#sheet');let onSubmit=null;
+const dlg=$('#sheet');let onSubmit=null,sheetGen=0;
 function openSheet(title,body,fn,{submit='บันทึก',extra=''}={}){
   $('#sheetTitle').textContent=title;$('#sheetBody').innerHTML=body;
   $('#sheetFoot').innerHTML=extra+(fn?`<button class="btn primary" type="submit">${submit}</button>`:'');
-  onSubmit=fn;if(!dlg.open)dlg.showModal();
+  onSubmit=fn;sheetGen++;if(!dlg.open)dlg.showModal();
   $('#sheetBody').scrollTop=0;
 }
 $('#sheetForm').addEventListener('submit',async e=>{
   e.preventDefault();if(!onSubmit)return dlg.close();
   const form=e.target;if(!form.checkValidity()){form.reportValidity();return}
   const btn=form.querySelector('[type=submit]');if(btn)btn.disabled=true;
+  const gen=sheetGen;
   let r;try{r=await onSubmit(new FormData(form))}finally{if(btn)btn.disabled=false}
   if(r===false)return;
-  dlg.close();if(r!=='nosave')save();render();
+  if(gen===sheetGen)dlg.close(); // ถ้ามีฟอร์มอื่นเปิดแทนระหว่างรอ อย่าปิดทับ
+  if(r!=='nosave')save();render();
 });
 dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
 dlg.addEventListener('close',()=>{if(dlg.dataset.login&&!user&&typeof started!=='undefined'&&!started)setTimeout(afterAuth,0);delete dlg.dataset.login});
@@ -447,6 +454,7 @@ function fuelForm(f){
      <label class="chk"><input type="checkbox" name="full" ${f.full?'checked':''}> เติมเต็มถัง</label>`,
     fd=>{
       const o={id:f.id||uid(),date:fd.get('date'),odo:+fd.get('odo'),liters:+fd.get('liters'),price:+fd.get('price'),type:fd.get('type'),full:fd.has('full')};
+      if(isNew&&o.odo<curOdo()&&!confirm(`เลขไมล์ ${num(o.odo)} น้อยกว่าเลขไมล์ล่าสุด (${num(curOdo())}) ถ้าเป็นการบันทึกย้อนหลังกดตกลง ถ้าพิมพ์ผิดกดยกเลิก`))return false;
       if(isNew)S.fuel.push(o);else Object.assign(S.fuel.find(x=>x.id===f.id),o);
       bumpOdo(o.odo);toast('บันทึกแล้ว');
     },{extra:isNew?'':`<button type="button" class="btn danger" data-act="delFuel" data-id="${f.id}">${ic('trash','sm')}</button>`});
@@ -554,7 +562,7 @@ function settingsForm(){
        <div class="row">${ic('upload','sm')}<div style="flex:1">นำเข้าข้อมูล<br><span class="small muted">กู้คืนจากไฟล์สำรอง (จะแทนที่ข้อมูลเดิม)</span></div><button type="button" class="btn sm" data-act="import">นำเข้า</button></div>
      </div>
      <button type="button" class="btn danger block" data-act="reset">${ic('trash','sm')}ล้างข้อมูลทั้งหมด</button>
-     <div class="credit">ข้อมูลเก็บในเครื่องและซิงก์ขึ้น Supabase เมื่อเข้าสู่ระบบ · v1.1</div>`,
+     <div class="credit">ข้อมูลเก็บในเครื่องและซิงก์ขึ้น Supabase เมื่อเข้าสู่ระบบ · v1.1.1</div>`,
     fd=>{
       Object.assign(S.bike,{name:fd.get('name').trim(),plate:fd.get('plate').trim(),year:+fd.get('year')||''});
       Object.assign(S.settings,{warnKm:+fd.get('warnKm'),warnDays:+fd.get('warnDays'),docDays:+fd.get('docDays')});
@@ -567,7 +575,7 @@ const find=(arr,id)=>S[arr].find(x=>x.id===id);
 const del=(arr,id,msg)=>{if(!confirm(msg))return;S[arr]=S[arr].filter(x=>x.id!==id);dlg.close();save();render();toast('ลบแล้ว')};
 const ACT={
   close:()=>dlg.close(),
-  odo:odoForm,settings:settingsForm,
+  odo:odoForm,settings:settingsForm,setup:()=>setupForm(),
   addFuel:()=>fuelForm(),editFuel:id=>fuelForm(find('fuel',id)),delFuel:id=>del('fuel',id,'ลบรายการเติมน้ำมันนี้?'),
   addLog:()=>logForm(),editLog:id=>logForm(find('logs',id)),delLog:id=>del('logs',id,'ลบรายการนี้?'),
   addItem:()=>itemForm(),editItem:id=>itemForm(find('items',id)),delItem:id=>del('items',id,'ลบรายการบำรุงรักษานี้?'),
@@ -643,7 +651,7 @@ function setSync(st){syncState=st;const b=$('#syncBtn');if(!b)return;b.className
 async function initCloud(){
   try{
     const m=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
-    sb=m.createClient(SUPA_URL,SUPA_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:'bikelog-auth'}});
+    sb=m.createClient(SUPA_URL,SUPA_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'implicit',storageKey:'bikelog-auth'}});
   }catch(e){setSync('offline');return afterAuth()}
   const {data:{session}}=await sb.auth.getSession();
   user=session?.user||null;
@@ -697,7 +705,7 @@ function loginForm(mode='in'){
       const res=up?await sb.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}}):await sb.auth.signInWithPassword({email,password});
       if(res.error){$('#authMsg').style.color='var(--red)';$('#authMsg').textContent=AUTH_ERR[res.error.message]||res.error.message;return false}
       if(up&&!res.data.session){$('#authMsg').style.color='var(--green)';$('#authMsg').textContent='ส่งลิงก์ยืนยันไปที่อีเมลแล้ว กดลิงก์ในอีเมล แล้วแอพจะเข้าสู่ระบบให้';return false}
-      user=res.data.user;await pull();toast('เข้าสู่ระบบแล้ว');setTimeout(afterAuth,60);return 'nosave';
+      user=res.data.user;await pull();toast('เข้าสู่ระบบแล้ว');setTimeout(()=>{if(started&&!S.setup&&!dlg.open)setupForm();else afterAuth()},60);return 'nosave';
     },{submit:up?'สมัคร':'เข้าสู่ระบบ'});
   dlg.dataset.login='1';
 }
