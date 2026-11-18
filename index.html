@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1E2A4A">
+<meta name="description" content="สมุดดูแลรถมอเตอร์ไซค์ บันทึกน้ำมัน รอบเปลี่ยนอะไหล่ ประวัติซ่อม และวันต่อ พ.ร.บ./ภาษี">
+<title>สมุดดูแลรถ</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1E2A4A;--navy2:#2C3C66;--amber:#FFB020;--amber-soft:#FFF3DA;
+  --bg:#F3F4F8;--card:#fff;--text:#1B2236;--muted:#6B7387;--line:#E4E7EF;
+  --red:#E5484D;--red-soft:#FDECEC;--orange:#E58A00;--orange-soft:#FFF2DC;--green:#2BA471;--green-soft:#E3F5EC;
+  --r:16px;--shadow:0 1px 2px rgba(20,30,60,.06),0 4px 14px rgba(20,30,60,.05);
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0F1424;--card:#192036;--text:#EEF1F8;--muted:#98A1B8;--line:#2A3350;
+    --amber-soft:#3A2F14;--red-soft:#3B1C22;--orange-soft:#3A2A10;--green-soft:#123326;--shadow:none}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:"Noto Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px}
+body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+.wrap{max-width:560px;margin:0 auto;padding:0 14px}
+button,input,select,textarea{font:inherit;color:inherit}
+.ic{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ic.sm{width:18px;height:18px}.ic.lg{width:28px;height:28px}
+
+header{background:var(--navy);color:#fff;padding:calc(14px + env(safe-area-inset-top)) 0 18px;position:sticky;top:0;z-index:5}
+header .wrap{display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;margin:0;font-weight:600;line-height:1.2}
+header small{display:block;opacity:.7;font-size:12.5px;font-weight:400}
+.hbtn{margin-left:auto;background:rgba(255,255,255,.1);border:0;border-radius:12px;width:40px;height:40px;display:grid;place-items:center;color:#fff;cursor:pointer}
+.hbtn.sync.ok{color:#5BE3A0}.hbtn.sync.syncing{color:var(--amber)}.hbtn.sync.err,.hbtn.sync.offline{color:#FF8A8F}.hbtn.sync.off{color:rgba(255,255,255,.55)}
+.logo{width:40px;height:40px;border-radius:12px;background:var(--amber);color:var(--navy);display:grid;place-items:center}
+
+main{padding-top:14px}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;margin-bottom:12px}
+.card h2{font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:8px;font-weight:600}
+.card h2 .act{margin-left:auto}
+.muted{color:var(--muted)}.small{font-size:13px}
+.row{display:flex;align-items:center;gap:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:14px}
+.stat b{display:block;font-size:22px;font-weight:700;line-height:1.3}
+.stat span{font-size:12.5px;color:var(--muted)}
+
+.odo{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff}
+.odo .big{font-size:34px;font-weight:700;letter-spacing:.5px;line-height:1.1}
+.odo .muted{color:rgba(255,255,255,.7)}
+
+.btn{border:0;border-radius:12px;padding:11px 16px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--bg);color:var(--text)}
+.btn.primary{background:var(--navy);color:#fff}
+.btn.amber{background:var(--amber);color:var(--navy)}
+.btn.ghost{background:transparent;color:var(--navy);padding:6px 8px}
+@media (prefers-color-scheme:dark){.btn.ghost{color:var(--amber)}.btn.primary{background:var(--amber);color:var(--navy)}}
+.btn.danger{background:var(--red-soft);color:var(--red)}
+.btn.block{width:100%}
+.btn.sm{padding:7px 12px;font-size:13.5px;border-radius:10px}
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.quick .btn{padding:14px;border-radius:var(--r);box-shadow:var(--shadow);background:var(--card)}
+.quick .btn .tile{width:34px;height:34px}
+
+.tile{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--amber-soft);color:var(--navy);flex:none}
+@media (prefers-color-scheme:dark){.tile{color:var(--amber)}}
+.tile.over{background:var(--red-soft);color:var(--red)}
+.tile.soon{background:var(--orange-soft);color:var(--orange)}
+
+.list{display:flex;flex-direction:column}
+.item{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;width:100%}
+.item:first-child{border-top:0}
+.item .body{flex:1;min-width:0}
+.item .t{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .s{display:block;font-size:12.5px;color:var(--muted)}
+.item .r{text-align:right;flex:none}
+.item .r b{display:block}
+
+.bar{height:6px;border-radius:6px;background:var(--line);overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;border-radius:6px;background:var(--green)}
+.bar i.soon{background:var(--orange)}.bar i.over{background:var(--red)}
+.badge{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--green-soft);color:var(--green);white-space:nowrap}
+.badge.soon{background:var(--orange-soft);color:var(--orange)}
+.badge.over{background:var(--red-soft);color:var(--red)}
+.badge.gray{background:var(--bg);color:var(--muted)}
+
+.empty{text-align:center;padding:26px 10px;color:var(--muted)}
+.empty .tile{margin:0 auto 10px;width:52px;height:52px}
+.hint{background:var(--amber-soft);border-radius:12px;padding:10px 12px;font-size:13px;margin-bottom:12px;display:flex;gap:8px}
+.month{font-size:12.5px;font-weight:600;color:var(--muted);margin:14px 0 2px}
+
+.chart{display:flex;align-items:flex-end;gap:8px;height:130px;padding-top:6px}
+.chart .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%}
+.chart .stack{flex:1;width:100%;max-width:34px;display:flex;flex-direction:column;justify-content:flex-end;border-radius:8px;overflow:hidden}
+.chart .stack i{display:block;width:100%}
+.chart .fb{background:var(--amber)}.chart .ob{background:var(--navy2)}
+@media (prefers-color-scheme:dark){.chart .ob{background:#5C77C2}}
+.chart label{font-size:11.5px;color:var(--muted)}
+.legend{display:flex;gap:14px;font-size:12.5px;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:6}
+nav .wrap{display:grid;grid-template-columns:repeat(5,1fr);padding:0 4px}
+nav button{background:none;border:0;padding:8px 0 9px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11.5px;color:var(--muted);cursor:pointer}
+nav button.on{color:var(--navy);font-weight:600}
+@media (prefers-color-scheme:dark){nav button.on{color:var(--amber)}}
+nav button.on .ic{stroke-width:2.2}
+
+dialog{border:0;padding:0;width:100%;max-width:560px;max-height:92vh;margin:auto auto 0;border-radius:20px 20px 0 0;background:var(--card);color:var(--text)}
+dialog::backdrop{background:rgba(10,15,30,.45)}
+dialog form{display:flex;flex-direction:column;max-height:92vh}
+.sh-head{display:flex;align-items:center;padding:16px 16px 8px}
+.sh-head h3{margin:0;font-size:17px}
+.sh-head .x{margin-left:auto;background:var(--bg);border:0;border-radius:10px;width:34px;height:34px;display:grid;place-items:center;cursor:pointer}
+.sh-body{padding:4px 16px 8px;overflow:auto}
+.sh-foot{display:flex;gap:10px;padding:10px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.sh-foot .btn{flex:1}.sh-foot .btn.danger{flex:0 0 52px}a.btn{text-decoration:none}
+.f{margin-bottom:12px}
+.f label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
+.f input,.f select,.f textarea{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--bg);outline:none}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:var(--amber)}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chk{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:14px}
+.chk input{width:20px;height:20px;accent-color:var(--navy)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips label{display:flex;align-items:center;gap:6px;padding:6px 10px;border:1.5px solid var(--line);border-radius:20px;font-size:13px;cursor:pointer}
+.chips input{accent-color:var(--navy)}
+.chips label:has(input:checked){border-color:var(--amber);background:var(--amber-soft)}
+.calc{font-size:13px;color:var(--muted);margin:-4px 0 10px}
+
+.toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:20;max-width:90%}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.credit{text-align:center;font-size:11.5px;color:var(--muted);padding:6px 0 14px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="logo" id="logo"></div>
+    <div><h1 id="bikeName">สมุดดูแลรถ</h1><small id="bikeSub"></small></div>
+    <button class="hbtn sync" data-act="syncTap" aria-label="สถานะซิงก์" id="syncBtn" style="margin-left:auto"></button>
+    <button class="hbtn" data-act="settings" aria-label="ตั้งค่า" id="setBtn" style="margin-left:0"></button>
+  </div>
+</header>
+
+<main class="wrap" id="view"></main>
+
+<nav><div class="wrap" id="tabs"></div></nav>
+
+<dialog id="sheet">
+  <form id="sheetForm" method="dialog" novalidate>
+    <div class="sh-head"><h3 id="sheetTitle"></h3><button type="button" class="x" data-act="close" aria-label="ปิด" id="xBtn"></button></div>
+    <div class="sh-body" id="sheetBody"></div>
+    <div class="sh-foot" id="sheetFoot"></div>
+  </form>
+</dialog>
+<input type="file" id="importFile" accept="application/json,.json" hidden>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- ไอคอน (เส้น 24px) ---------- */
+const ICONS={
+  home:"M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",
+  fuel:"M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h12M4 10h10M14 8h2a2 2 0 0 1 2 2v6a1.5 1.5 0 0 0 3 0V8l-3-3",
+  wrench:"M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z",
+  history:"M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2",
+  doc:"M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8zM14 3v5h5M9 13h6M9 17h4",
+  settings:"M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z",
+  plus:"M12 5v14M5 12h14",
+  x:"M6 6l12 12M18 6 6 18",
+  oil:"M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11zM9.5 15a2.5 2.5 0 0 0 2.5 2.5",
+  drop:"M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z",
+  gear:"M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1",
+  filter:"M3 5h18l-7 8v6l-4 2v-8z",
+  spark:"M13 2 4 14h7l-1 8 9-12h-7z",
+  belt:"M7 7a5 5 0 1 0 0 10h10a5 5 0 1 0 0-10zM7 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM17 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4z",
+  clutch:"M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7.5v.01M7.5 14v.01M16.5 14v.01M12 12v.01",
+  coolant:"M14 14.8V4a2 2 0 0 0-4 0v10.8a4 4 0 1 0 4 0zM12 10v7",
+  brake:"M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2",
+  tire:"M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM12 2v5M12 17v5M2 12h5M17 12h5",
+  battery:"M3 7h15a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1zM22 10v4M6 12h4M8 10v4M13 12h3",
+  clean:"M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6",
+  shield:"M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6zM9 12l2 2 4-4",
+  id:"M3 5h18v14H3zM7 10a2 2 0 1 0 4 0 2 2 0 0 0-4 0M6 16c.5-1.5 2-2 3-2s2.5.5 3 2M14 9h4M14 13h4",
+  receipt:"M6 2h12v20l-3-2-3 2-3-2-3 2zM9 7h6M9 11h6M9 15h4",
+  calendar:"M4 5h16v16H4zM4 10h16M8 3v4M16 3v4",
+  gauge:"M3.5 18a9 9 0 1 1 17 0M12 14l4-5M12 14v.01",
+  bell:"M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21a2 2 0 0 0 4 0",
+  download:"M12 3v12M7 10l5 5 5-5M4 21h16",
+  upload:"M12 15V3M7 8l5-5 5 5M4 21h16",
+  check:"M5 12l5 5 9-10",
+  trash:"M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14",
+  alert:"M12 3 2 20h20zM12 10v4M12 17v.01",
+  chart:"M4 20V10M10 20V4M16 20v-7M3 20h18",
+  bike:"M5 17a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19 17a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM5 14h4l3-5h4l3 5M12 9 10 5H7M15 5h3",
+  cloud:"M7 18a4.5 4.5 0 1 1 .9-8.9A6 6 0 0 1 19 11a3.5 3.5 0 0 1-.5 7z",
+  cloudOff:"M7 18a4.5 4.5 0 1 1 .9-8.9A6 6 0 0 1 19 11a3.5 3.5 0 0 1-.5 7zM3 3l18 18",
+  logout:"M15 3h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-4M10 17l-5-5 5-5M5 12h11",
+  install:"M12 3v10M8 9l4 4 4-4M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"
+};
+const ic=(n,c='')=>`<svg class="ic ${c}" viewBox="0 0 24 24" aria-hidden="true"><path d="${ICONS[n]||ICONS.wrench}"/></svg>`;
+
+/* ---------- วันที่และตัวเลข ---------- */
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const today=()=>iso(new Date());
+const parseD=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const addMonths=(s,m)=>{const d=parseD(s),day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+m);const last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();d.setDate(Math.min(day,last));return iso(d)};
+const addDays=(s,n)=>{const d=parseD(s);d.setDate(d.getDate()+n);return iso(d)};
+const diffDays=(a,b)=>Math.round((parseD(b)-parseD(a))/864e5);
+const fmtDate=s=>s?parseD(s).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'}):'-';
+const fmtMonth=k=>parseD(k+'-01').toLocaleDateString('th-TH',{month:'short',year:'2-digit'});
+const num=(n,d=0)=>Number(n||0).toLocaleString('th-TH',{minimumFractionDigits:d,maximumFractionDigits:d});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const $=s=>document.querySelector(s);
+
+/* ---------- ข้อมูล ---------- */
+const KEY='bikelog-v1';
+// ค่าเริ่มต้นสำหรับสกู๊ตเตอร์ 150cc ระบายความร้อนด้วยน้ำ (GPX Drone 150 4V) — แก้ได้ทุกค่าในแอพ
+const DEFAULT_ITEMS=[
+  ['oil','น้ำมันเครื่อง',3000,3,'ทุก 3,000 กม. หรือ 3 เดือน แล้วแต่อะไรถึงก่อน'],
+  ['gear','น้ำมันเฟืองท้าย',6000,12,'โดยทั่วไปเปลี่ยนทุก 2 รอบน้ำมันเครื่อง'],
+  ['filter','ไส้กรองอากาศ',10000,12,'ถ้าวิ่งที่ฝุ่นเยอะ ควรเช็กถี่ขึ้น'],
+  ['spark','หัวเทียน',10000,12,''],
+  ['belt','สายพานขับ',20000,24,'ควรตรวจรอยร้าวตั้งแต่ราว 10,000 กม.'],
+  ['clutch','เม็ดตุ้ม / ชุดคลัตช์',20000,24,'ตรวจพร้อมสายพาน'],
+  ['coolant','น้ำยาหม้อน้ำ',20000,24,'เช็กระดับในกระป๋องพักทุกเดือน'],
+  ['brake','ผ้าเบรก (ตรวจหน้า/หลัง)',6000,6,''],
+  ['drop','น้ำมันเบรก',0,24,''],
+  ['tire','ยางหน้า',20000,36,'เช็กลมยางทุกสัปดาห์'],
+  ['tire','ยางหลัง',15000,36,'ยางหลังมักสึกเร็วกว่ายางหน้า'],
+  ['battery','แบตเตอรี่',0,24,''],
+  ['clean','ล้างปีกผีเสื้อ / หัวฉีด',12000,12,'']
+];
+const DEFAULT_DOCS=[['doc','พ.ร.บ.'],['receipt','ภาษีรถประจำปี'],['shield','ประกันภัย'],['id','ใบขับขี่']];
+const CATS=['ซ่อม/บำรุงรักษา','อะไหล่/ของแต่ง','เอกสาร/ภาษี','ล้างรถ/อื่นๆ'];
+const FUELS=['แก๊สโซฮอล์ 95','แก๊สโซฮอล์ 91','E20','เบนซิน 95'];
+
+function fresh(){
+  const t=today();
+  return{v:1,setup:false,
+    bike:{name:'GPX Drone 150 4V',year:2023,plate:'',odo:0},
+    fuel:[],logs:[],
+    items:DEFAULT_ITEMS.map(([icon,name,km,months,note])=>({id:uid(),icon,name,km,months,note,lastKm:0,lastDate:t})),
+    docs:DEFAULT_DOCS.map(([icon,name])=>({id:uid(),icon,name,expiry:'',note:''})),
+    settings:{warnKm:300,warnDays:14,docDays:30,notifiedOn:''}};
+}
+let S;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!S||!S.bike)S=fresh();
+function persist(){localStorage.setItem(KEY,JSON.stringify(S))}
+function save(){S.updatedAt=Date.now();S.dirty=true;persist();snapshot();schedulePush()}
+
+const curOdo=()=>Math.max(+S.bike.odo||0,...S.fuel.map(f=>+f.odo||0),...S.logs.map(l=>+l.odo||0));
+
+/* ---------- คำนวณสถานะ ---------- */
+function itemStatus(it){
+  const odo=curOdo(),t=today();
+  let kmLeft=null,daysLeft=null,due=null,p1=0,p2=0;
+  if(+it.km>0){kmLeft=(+it.lastKm)+(+it.km)-odo;p1=(odo-it.lastKm)/it.km}
+  if(+it.months>0&&it.lastDate){due=addMonths(it.lastDate,+it.months);daysLeft=diffDays(t,due);const span=diffDays(it.lastDate,due)||1;p2=diffDays(it.lastDate,t)/span}
+  const over=(kmLeft!==null&&kmLeft<=0)||(daysLeft!==null&&daysLeft<=0);
+  const soon=!over&&((kmLeft!==null&&kmLeft<=S.settings.warnKm)||(daysLeft!==null&&daysLeft<=S.settings.warnDays));
+  const level=over?'over':soon?'soon':'ok';
+  let text;
+  if(over){
+    const parts=[];
+    if(kmLeft!==null&&kmLeft<=0)parts.push(`เกิน ${num(-kmLeft)} กม.`);
+    if(daysLeft!==null&&daysLeft<=0)parts.push(daysLeft===0?'ครบกำหนดวันนี้':`เกิน ${num(-daysLeft)} วัน`);
+    text=parts.join(' · ');
+  }else{
+    const parts=[];
+    if(kmLeft!==null)parts.push(`อีก ${num(kmLeft)} กม.`);
+    if(daysLeft!==null)parts.push(daysLeft>60?`ถึง ${fmtDate(due)}`:`อีก ${daysLeft} วัน`);
+    text=parts.join(' · ');
+  }
+  return{kmLeft,daysLeft,due,pct:Math.max(0,Math.min(1,Math.max(p1,p2))),level,text};
+}
+function docStatus(d){
+  if(!d.expiry)return{level:'none',text:'ยังไม่ได้ตั้งวันหมดอายุ',days:null};
+  const days=diffDays(today(),d.expiry);
+  if(days<0)return{level:'over',text:`หมดอายุแล้ว ${num(-days)} วัน`,days};
+  if(days===0)return{level:'over',text:'หมดอายุวันนี้',days};
+  if(days<=S.settings.docDays)return{level:'soon',text:`อีก ${days} วัน`,days};
+  return{level:'ok',text:`อีก ${num(days)} วัน`,days};
+}
+function alerts(){
+  const a=[];
+  S.items.forEach(it=>{const s=itemStatus(it);if(s.level!=='ok')a.push({kind:'item',id:it.id,icon:it.icon,name:it.name,level:s.level,text:s.text,w:s.level==='over'?0:1})});
+  S.docs.forEach(d=>{const s=docStatus(d);if(s.level==='over'||s.level==='soon')a.push({kind:'doc',id:d.id,icon:d.icon,name:d.name,level:s.level,text:s.text,w:s.level==='over'?0:1})});
+  return a.sort((x,y)=>x.w-y.w);
+}
+function fuelStats(){
+  const list=[...S.fuel].sort((a,b)=>a.odo-b.odo||a.date.localeCompare(b.date));
+  const per={};let lastFull=null,acc=0,accCost=0,totKm=0,totL=0,totCost=0,last=null;
+  list.forEach(f=>{
+    if(lastFull===null){if(f.full){lastFull=+f.odo;acc=0;accCost=0}return}
+    acc+=+f.liters;accCost+=+f.price;
+    if(f.full){
+      const km=f.odo-lastFull;
+      if(km>0&&acc>0){per[f.id]=km/acc;totKm+=km;totL+=acc;totCost+=accCost;last=km/acc}
+      lastFull=+f.odo;acc=0;accCost=0;
+    }
+  });
+  return{per,avg:totL?totKm/totL:null,last,bpk:totKm?totCost/totKm:null};
+}
+const monthKey=s=>s.slice(0,7);
+function monthTotals(n=6){
+  const keys=[];const d=new Date();d.setDate(1);
+  for(let i=n-1;i>=0;i--){const x=new Date(d.getFullYear(),d.getMonth()-i,1);keys.push(iso(x).slice(0,7))}
+  const m=Object.fromEntries(keys.map(k=>[k,{fuel:0,other:0}]));
+  S.fuel.forEach(f=>{const k=monthKey(f.date);if(m[k])m[k].fuel+=+f.price||0});
+  S.logs.forEach(l=>{const k=monthKey(l.date);if(m[k])m[k].other+=+l.cost||0});
+  return keys.map(k=>({k,...m[k]}));
+}
+
+/* ---------- UI ---------- */
+let tab='home';
+const TABS=[['home','home','หน้าหลัก'],['fuel','fuel','น้ำมัน'],['maint','wrench','บำรุงรักษา'],['logs','history','ประวัติ'],['docs','doc','เอกสาร']];
+function renderTabs(){$('#tabs').innerHTML=TABS.map(([k,i,l])=>`<button data-tab="${k}" class="${tab===k?'on':''}">${ic(i)}${l}</button>`).join('')}
+function renderHeader(){
+  $('#bikeName').textContent=S.bike.name||'สมุดดูแลรถ';
+  $('#bikeSub').textContent=[S.bike.plate,S.bike.year?'ปี '+S.bike.year:''].filter(Boolean).join(' · ')||'สมุดดูแลรถ';
+}
+function render(){
+  renderHeader();renderTabs();
+  $('#view').innerHTML=({home:vHome,fuel:vFuel,maint:vMaint,logs:vLogs,docs:vDocs})[tab]();
+  window.scrollTo(0,0);
+}
+const tileCls=l=>l==='over'?'over':l==='soon'?'soon':'';
+
+function vHome(){
+  const a=alerts(),fs=fuelStats(),mt=monthTotals(1)[0];
+  const upcoming=S.items.map(it=>({it,s:itemStatus(it)})).filter(x=>x.s.level==='ok').sort((x,y)=>y.s.pct-x.s.pct).slice(0,3);
+  let h=`<div class="card odo"><div class="row"><div style="flex:1"><div class="muted small">เลขไมล์ปัจจุบัน</div><div class="big">${num(curOdo())} <span style="font-size:16px;font-weight:500">กม.</span></div></div>
+    <button class="btn amber sm" data-act="odo">${ic('gauge','sm')}อัปเดต</button></div></div>
+  <div class="quick">
+    <button class="btn" data-act="addFuel"><span class="tile">${ic('fuel','sm')}</span>เติมน้ำมัน</button>
+    <button class="btn" data-act="addLog"><span class="tile">${ic('wrench','sm')}</span>บันทึกซ่อม</button>
+  </div>`;
+  if(deferredInstall)h+=`<div class="hint">${ic('install','sm')}<div style="flex:1">ติดตั้งเป็นแอพบนหน้าจอหลัก จะเปิดได้เร็วและใช้ได้แม้ไม่มีเน็ต</div><button class="btn sm primary" data-act="install">ติดตั้ง</button></div>`;
+  if('Notification' in window&&Notification.permission==='default')h+=`<div class="hint">${ic('bell','sm')}<div style="flex:1">เปิดการแจ้งเตือน ให้แอพเตือนเมื่อถึงรอบเปลี่ยนอะไหล่หรือใกล้ต่อ พ.ร.บ./ภาษี</div><button class="btn sm primary" data-act="notif">เปิด</button></div>`;
+  h+=`<div class="card"><h2>${ic('alert','sm')}ต้องดูแล ${a.length?`<span class="badge over">${a.length}</span>`:''}</h2>`;
+  h+=a.length?`<div class="list">${a.map(x=>`<button class="item" data-act="${x.kind==='item'?'editItem':'editDoc'}" data-id="${x.id}"><span class="tile ${tileCls(x.level)}">${ic(x.icon)}</span><span class="body"><span class="t">${esc(x.name)}</span><span class="s">${x.text}</span></span><span class="badge ${x.level}">${x.level==='over'?'ถึงรอบแล้ว':'ใกล้ถึง'}</span></button>`).join('')}</div>`
+    :`<div class="muted small">ทุกอย่างเรียบร้อย ยังไม่มีรายการที่ถึงรอบ</div>`;
+  h+=`</div><div class="grid2" style="margin-bottom:12px">
+    <div class="stat"><span>อัตราสิ้นเปลืองเฉลี่ย</span><b>${fs.avg?num(fs.avg,1):'-'}</b><span>กม./ลิตร</span></div>
+    <div class="stat"><span>ค่าใช้จ่ายเดือนนี้</span><b>${num(mt.fuel+mt.other)}</b><span>บาท (น้ำมัน ${num(mt.fuel)})</span></div></div>`;
+  if(upcoming.length)h+=`<div class="card"><h2>${ic('calendar','sm')}รายการถัดไป</h2><div class="list">${upcoming.map(({it,s})=>`<button class="item" data-act="editItem" data-id="${it.id}"><span class="tile">${ic(it.icon)}</span><span class="body"><span class="t">${esc(it.name)}</span><span class="s">${s.text}</span><div class="bar"><i style="width:${s.pct*100}%"></i></div></span></button>`).join('')}</div></div>`;
+  return h;
+}
+
+function vFuel(){
+  const fs=fuelStats(),mt=monthTotals(1)[0];
+  const list=[...S.fuel].sort((a,b)=>b.date.localeCompare(a.date)||b.odo-a.odo);
+  let h=`<div class="grid2" style="margin-bottom:12px">
+    <div class="stat"><span>เฉลี่ย</span><b>${fs.avg?num(fs.avg,1):'-'}</b><span>กม./ลิตร</span></div>
+    <div class="stat"><span>ครั้งล่าสุด</span><b>${fs.last?num(fs.last,1):'-'}</b><span>กม./ลิตร</span></div>
+    <div class="stat"><span>ค่าน้ำมันต่อกิโล</span><b>${fs.bpk?num(fs.bpk,2):'-'}</b><span>บาท/กม.</span></div>
+    <div class="stat"><span>ค่าน้ำมันเดือนนี้</span><b>${num(mt.fuel)}</b><span>บาท</span></div></div>
+  <div class="card"><h2>${ic('fuel','sm')}ประวัติเติมน้ำมัน<button class="btn sm primary act" data-act="addFuel">${ic('plus','sm')}เติม</button></h2>`;
+  if(!list.length)h+=`<div class="empty"><div class="tile">${ic('fuel','lg')}</div>ยังไม่มีข้อมูล<br><span class="small">เติมเต็มถังอย่างน้อย 2 ครั้ง แอพจะคำนวณ กม./ลิตร ให้</span></div>`;
+  else h+=`<div class="list">${list.map(f=>`<button class="item" data-act="editFuel" data-id="${f.id}"><span class="tile">${ic('fuel')}</span><span class="body"><span class="t">${num(f.liters,2)} ลิตร · ${num(f.price)} บาท</span><span class="s">${fmtDate(f.date)} · ${num(f.odo)} กม. · ${num(f.price/f.liters,2)} บ./ลิตร${f.full?'':' · ไม่เต็มถัง'}</span></span><span class="r">${fs.per[f.id]?`<span class="badge">${num(fs.per[f.id],1)} กม./ล.</span>`:''}</span></button>`).join('')}</div>`;
+  h+=`</div><div class="muted small" style="padding:0 4px 12px">กม./ลิตร คำนวณจากการเติมเต็มถังสองครั้งติดกัน ถ้าครั้งไหนเติมไม่เต็ม ให้ติ๊กออก แอพจะรวมไปคำนวณกับครั้งที่เติมเต็มถัดไป</div>`;
+  return h;
+}
+
+function vMaint(){
+  const rows=S.items.map(it=>({it,s:itemStatus(it)})).sort((a,b)=>({over:0,soon:1,ok:2}[a.s.level]-{over:0,soon:1,ok:2}[b.s.level])||b.s.pct-a.s.pct);
+  let h=`<div class="hint">${ic('wrench','sm')}<div>แตะแต่ละรายการเพื่อตั้งค่าว่าเปลี่ยนครั้งล่าสุดที่กี่กิโลและวันไหน หรือกด "ทำแล้ว" ตอนเปลี่ยนเสร็จ ค่ารอบเริ่มต้นเป็นค่าทั่วไปของสกู๊ตเตอร์ 150cc ควรเทียบกับคู่มือรถหรือศูนย์ GPX</div></div>
+  <div class="card"><h2>${ic('wrench','sm')}รอบเปลี่ยนอะไหล่<button class="btn sm primary act" data-act="addItem">${ic('plus','sm')}เพิ่ม</button></h2><div class="list">`;
+  h+=rows.map(({it,s})=>`<button class="item" data-act="editItem" data-id="${it.id}"><span class="tile ${tileCls(s.level)}">${ic(it.icon)}</span><span class="body"><span class="t">${esc(it.name)}</span><span class="s">${[+it.km?`ทุก ${num(it.km)} กม.`:'',+it.months?`${it.months} เดือน`:''].filter(Boolean).join(' / ')} · ${s.text}</span><div class="bar"><i class="${s.level}" style="width:${Math.max(3,s.pct*100)}%"></i></div></span></button>`).join('');
+  return h+`</div></div>`;
+}
+
+function vLogs(){
+  const mt=monthTotals(6),max=Math.max(1,...mt.map(m=>m.fuel+m.other));
+  const year=String(new Date().getFullYear());
+  const yr=S.logs.filter(l=>l.date.startsWith(year)).reduce((s,l)=>s+(+l.cost||0),0)+S.fuel.filter(f=>f.date.startsWith(year)).reduce((s,f)=>s+(+f.price||0),0);
+  let h=`<div class="card"><h2>${ic('chart','sm')}ค่าใช้จ่าย 6 เดือน<span class="act muted small" style="font-weight:400">ปีนี้ ${num(yr)} บาท</span></h2>
+    <div class="chart">${mt.map(m=>`<div class="col"><span class="small muted" style="font-size:10.5px">${m.fuel+m.other?num(m.fuel+m.other):''}</span><div class="stack"><i class="ob" style="height:${m.other/max*100}%"></i><i class="fb" style="height:${m.fuel/max*100}%"></i></div><label>${fmtMonth(m.k)}</label></div>`).join('')}</div>
+    <div class="legend"><span><i style="background:var(--amber)"></i>น้ำมัน</span><span><i style="background:var(--navy2)"></i>ซ่อม/อื่นๆ</span></div></div>
+  <div class="card"><h2>${ic('history','sm')}ประวัติซ่อม/ค่าใช้จ่าย<button class="btn sm primary act" data-act="addLog">${ic('plus','sm')}บันทึก</button></h2>`;
+  const list=[...S.logs].sort((a,b)=>b.date.localeCompare(a.date)||b.odo-a.odo);
+  if(!list.length)return h+`<div class="empty"><div class="tile">${ic('history','lg')}</div>ยังไม่มีประวัติ<br><span class="small">บันทึกทุกครั้งที่เข้าร้าน เปลี่ยนอะไหล่ หรือจ่ายภาษี</span></div></div>`;
+  let cur='';
+  list.forEach(l=>{
+    const k=monthKey(l.date);
+    if(k!==cur){cur=k;const tot=list.filter(x=>monthKey(x.date)===k).reduce((s,x)=>s+(+x.cost||0),0);h+=`<div class="month">${parseD(k+'-01').toLocaleDateString('th-TH',{month:'long',year:'numeric'})} · ${num(tot)} บาท</div>`}
+    const done=(l.items||[]).map(id=>S.items.find(i=>i.id===id)?.name).filter(Boolean);
+    h+=`<button class="item" data-act="editLog" data-id="${l.id}"><span class="tile">${ic(l.cat===CATS[2]?'receipt':'wrench')}</span><span class="body"><span class="t">${esc(l.title)}</span><span class="s">${fmtDate(l.date)}${+l.odo?` · ${num(l.odo)} กม.`:''}${l.shop?` · ${esc(l.shop)}`:''}${done.length?`<br>${esc(done.join(', '))}`:''}</span></span><span class="r"><b>${num(l.cost)}</b><span class="s">บาท</span></span></button>`;
+  });
+  return h+`</div>`;
+}
+
+function vDocs(){
+  let h=`<div class="card"><h2>${ic('doc','sm')}เอกสารและวันหมดอายุ<button class="btn sm primary act" data-act="addDoc">${ic('plus','sm')}เพิ่ม</button></h2><div class="list">`;
+  h+=S.docs.map(d=>{const s=docStatus(d);return`<div class="item" style="cursor:default;flex-wrap:wrap"><span class="tile ${tileCls(s.level)}">${ic(d.icon)}</span><span class="body"><span class="t">${esc(d.name)}</span><span class="s">${d.expiry?`หมดอายุ ${fmtDate(d.expiry)}`:''}${d.note?` · ${esc(d.note)}`:''}</span></span><span class="badge ${s.level==='none'?'gray':s.level}">${s.text}</span>
+    <div style="display:flex;gap:6px;width:100%;padding-left:54px">
+      <button class="btn sm" data-act="renewDoc" data-id="${d.id}">${ic('check','sm')}ต่ออายุแล้ว</button>
+      <button class="btn sm" data-act="editDoc" data-id="${d.id}">แก้ไข</button>
+      ${d.expiry?`<a class="btn sm ghost" target="_blank" rel="noopener" href="${gcal(d)}">${ic('calendar','sm')}ลงปฏิทิน</a>`:''}
+    </div></div>`}).join('');
+  return h+`</div></div><div class="muted small" style="padding:0 4px 12px">"ลงปฏิทิน" จะเพิ่มนัดใน Google Calendar ล่วงหน้า 7 วันก่อนหมดอายุ ช่วยให้มีแจ้งเตือนอีกทางแม้ไม่ได้เปิดแอพ</div>`;
+}
+function gcal(d){
+  const day=addDays(d.expiry,-7);const a=day.replace(/-/g,''),b=addDays(day,1).replace(/-/g,'');
+  return`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('ต่อ'+d.name+' '+(S.bike.plate||S.bike.name))}&dates=${a}/${b}&details=${encodeURIComponent(d.name+' หมดอายุ '+fmtDate(d.expiry)+'\nจากแอพสมุดดูแลรถ')}`;
+}
+
+/* ---------- Bottom sheet ---------- */
+const dlg=$('#sheet');let onSubmit=null;
+function openSheet(title,body,fn,{submit='บันทึก',extra=''}={}){
+  $('#sheetTitle').textContent=title;$('#sheetBody').innerHTML=body;
+  $('#sheetFoot').innerHTML=extra+(fn?`<button class="btn primary" type="submit">${submit}</button>`:'');
+  onSubmit=fn;if(!dlg.open)dlg.showModal();
+  $('#sheetBody').scrollTop=0;
+}
+$('#sheetForm').addEventListener('submit',async e=>{
+  e.preventDefault();if(!onSubmit)return dlg.close();
+  const form=e.target;if(!form.checkValidity()){form.reportValidity();return}
+  const btn=form.querySelector('[type=submit]');if(btn)btn.disabled=true;
+  let r;try{r=await onSubmit(new FormData(form))}finally{if(btn)btn.disabled=false}
+  if(r===false)return;
+  dlg.close();if(r!=='nosave')save();render();
+});
+dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
+dlg.addEventListener('close',()=>{if(dlg.dataset.login&&!user&&typeof started!=='undefined'&&!started)setTimeout(afterAuth,0);delete dlg.dataset.login});
+const fld=(label,html)=>`<div class="f"><label>${label}</label>${html}</div>`;
+const inp=(name,val='',attr='')=>`<input name="${name}" value="${esc(val)}" ${attr}>`;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200)}
+function bumpOdo(v){if(+v>(+S.bike.odo||0))S.bike.odo=+v}
+
+/* ---------- Forms ---------- */
+function fuelForm(f){
+  const isNew=!f;f=f||{date:today(),odo:'',liters:'',price:'',type:FUELS[0],full:true};
+  openSheet(isNew?'เติมน้ำมัน':'แก้ไขการเติมน้ำมัน',
+    `<div class="f2">${fld('วันที่',inp('date',f.date,'type="date" required'))}${fld('เลขไมล์ (กม.)',inp('odo',f.odo,`type="number" inputmode="numeric" min="0" required placeholder="${curOdo()}"`))}</div>
+     <div class="f2">${fld('จำนวนลิตร',inp('liters',f.liters,'type="number" inputmode="decimal" step="0.01" min="0.01" required'))}${fld('จ่ายทั้งหมด (บาท)',inp('price',f.price,'type="number" inputmode="decimal" step="0.01" min="0" required'))}</div>
+     <div class="calc" id="ppl"></div>
+     ${fld('ชนิดน้ำมัน',`<select name="type">${FUELS.map(x=>`<option ${x===f.type?'selected':''}>${x}</option>`).join('')}</select>`)}
+     <label class="chk"><input type="checkbox" name="full" ${f.full?'checked':''}> เติมเต็มถัง</label>`,
+    fd=>{
+      const o={id:f.id||uid(),date:fd.get('date'),odo:+fd.get('odo'),liters:+fd.get('liters'),price:+fd.get('price'),type:fd.get('type'),full:fd.has('full')};
+      if(isNew)S.fuel.push(o);else Object.assign(S.fuel.find(x=>x.id===f.id),o);
+      bumpOdo(o.odo);toast('บันทึกแล้ว');
+    },{extra:isNew?'':`<button type="button" class="btn danger" data-act="delFuel" data-id="${f.id}">${ic('trash','sm')}</button>`});
+  const upd=()=>{const l=+dlg.querySelector('[name=liters]').value,p=+dlg.querySelector('[name=price]').value;$('#ppl').textContent=l&&p?`เฉลี่ย ${num(p/l,2)} บาท/ลิตร`:''};
+  dlg.querySelectorAll('[name=liters],[name=price]').forEach(x=>x.addEventListener('input',upd));upd();
+}
+
+function logForm(l,preset={}){
+  const isNew=!l;l=l||{date:today(),odo:curOdo()||'',title:preset.title||'',cat:preset.cat||CATS[0],cost:'',shop:'',note:'',items:preset.items||[]};
+  openSheet(isNew?'บันทึกซ่อม/ค่าใช้จ่าย':'แก้ไขรายการ',
+    `${fld('รายการ',inp('title',l.title,'required placeholder="เช่น เปลี่ยนน้ำมันเครื่อง + เฟืองท้าย"'))}
+     <div class="f2">${fld('วันที่',inp('date',l.date,'type="date" required'))}${fld('เลขไมล์ (กม.)',inp('odo',l.odo,'type="number" inputmode="numeric" min="0"'))}</div>
+     <div class="f2">${fld('ค่าใช้จ่าย (บาท)',inp('cost',l.cost,'type="number" inputmode="decimal" step="0.01" min="0"'))}${fld('หมวด',`<select name="cat">${CATS.map(c=>`<option ${c===l.cat?'selected':''}>${c}</option>`).join('')}</select>`)}</div>
+     ${fld('ร้าน/ศูนย์',inp('shop',l.shop,'placeholder="ไม่บังคับ"'))}
+     ${fld('ทำรายการไหนบ้าง (จะรีเซ็ตรอบให้อัตโนมัติ)',`<div class="chips">${S.items.map(it=>`<label><input type="checkbox" name="items" value="${it.id}" ${(l.items||[]).includes(it.id)?'checked':''}>${esc(it.name)}</label>`).join('')}</div>`)}
+     ${fld('หมายเหตุ',`<textarea name="note" rows="2">${esc(l.note)}</textarea>`)}`,
+    fd=>{
+      const o={id:l.id||uid(),title:fd.get('title').trim(),date:fd.get('date'),odo:+fd.get('odo')||0,cost:+fd.get('cost')||0,cat:fd.get('cat'),shop:fd.get('shop').trim(),note:fd.get('note').trim(),items:fd.getAll('items')};
+      if(isNew)S.logs.push(o);else Object.assign(S.logs.find(x=>x.id===l.id),o);
+      bumpOdo(o.odo);
+      o.items.forEach(id=>{const it=S.items.find(i=>i.id===id);if(it&&o.date>=it.lastDate){it.lastDate=o.date;if(o.odo)it.lastKm=o.odo}});
+      toast(o.items.length?`บันทึกแล้ว รีเซ็ตรอบ ${o.items.length} รายการ`:'บันทึกแล้ว');
+    },{extra:isNew?'':`<button type="button" class="btn danger" data-act="delLog" data-id="${l.id}">${ic('trash','sm')}</button>`});
+}
+
+function itemForm(it){
+  const isNew=!it;it=it||{icon:'wrench',name:'',km:'',months:'',lastKm:curOdo(),lastDate:today(),note:''};
+  const s=isNew?null:itemStatus(it);
+  openSheet(isNew?'เพิ่มรายการบำรุงรักษา':it.name,
+    `${s?`<div class="hint" style="background:var(--${s.level==='ok'?'green':s.level==='soon'?'orange':'red'}-soft)">${ic(it.icon,'sm')}<div><b>${s.text}</b>${s.due?`<br><span class="small">ครบรอบตามเวลา ${fmtDate(s.due)}</span>`:''}${+it.km?`<br><span class="small">ครบรอบตามระยะที่ ${num(+it.lastKm+ +it.km)} กม.</span>`:''}</div></div>
+     <button type="button" class="btn amber block" style="margin-bottom:14px" data-act="doneItem" data-id="${it.id}">${ic('check','sm')}ทำแล้ว (บันทึกพร้อมค่าใช้จ่าย)</button>`:''}
+     ${fld('ชื่อรายการ',inp('name',it.name,'required'))}
+     <div class="f2">${fld('รอบระยะทาง (กม.)',inp('km',it.km||'','type="number" inputmode="numeric" min="0" placeholder="0 = ไม่ใช้"'))}${fld('รอบเวลา (เดือน)',inp('months',it.months||'','type="number" inputmode="numeric" min="0" placeholder="0 = ไม่ใช้"'))}</div>
+     <div class="f2">${fld('ทำครั้งล่าสุดที่ (กม.)',inp('lastKm',it.lastKm,'type="number" inputmode="numeric" min="0" required'))}${fld('ทำครั้งล่าสุดวันที่',inp('lastDate',it.lastDate,'type="date" required'))}</div>
+     ${fld('หมายเหตุ',`<textarea name="note" rows="2">${esc(it.note)}</textarea>`)}`,
+    fd=>{
+      const o={name:fd.get('name').trim(),km:+fd.get('km')||0,months:+fd.get('months')||0,lastKm:+fd.get('lastKm')||0,lastDate:fd.get('lastDate'),note:fd.get('note').trim()};
+      if(!o.km&&!o.months){toast('ต้องใส่รอบระยะทางหรือรอบเวลาอย่างน้อยหนึ่งอย่าง');return false}
+      if(isNew)S.items.push({id:uid(),icon:'wrench',...o});else Object.assign(S.items.find(x=>x.id===it.id),o);
+      toast('บันทึกแล้ว');
+    },{extra:isNew?'':`<button type="button" class="btn danger" data-act="delItem" data-id="${it.id}">${ic('trash','sm')}</button>`});
+}
+
+function docForm(d){
+  const isNew=!d;d=d||{icon:'doc',name:'',expiry:'',note:''};
+  openSheet(isNew?'เพิ่มเอกสาร':'แก้ไข '+d.name,
+    `${fld('ชื่อเอกสาร',inp('name',d.name,'required placeholder="เช่น ตรวจสภาพรถ"'))}
+     ${fld('วันหมดอายุ',inp('expiry',d.expiry,'type="date"'))}
+     ${fld('หมายเหตุ',inp('note',d.note,'placeholder="เช่น บริษัทประกัน, เลขกรมธรรม์"'))}`,
+    fd=>{
+      const o={name:fd.get('name').trim(),expiry:fd.get('expiry'),note:fd.get('note').trim()};
+      if(isNew)S.docs.push({id:uid(),icon:'doc',...o});else Object.assign(S.docs.find(x=>x.id===d.id),o);
+      toast('บันทึกแล้ว');
+    },{extra:isNew?'':`<button type="button" class="btn danger" data-act="delDoc" data-id="${d.id}">${ic('trash','sm')}</button>`});
+}
+function renewForm(d){
+  const base=d.expiry&&d.expiry>today()?d.expiry:today();
+  openSheet('ต่ออายุ '+d.name,
+    `${fld('วันหมดอายุใหม่',inp('expiry',addMonths(base,d.name==='ใบขับขี่'?60:12),'type="date" required'))}
+     <div class="f2">${fld('วันที่จ่าย',inp('date',today(),'type="date" required'))}${fld('ค่าใช้จ่าย (บาท)',inp('cost','','type="number" inputmode="decimal" step="0.01" min="0"'))}</div>
+     <div class="muted small">ค่าใช้จ่ายจะถูกบันทึกในประวัติ หมวดเอกสาร/ภาษี</div>`,
+    fd=>{
+      d.expiry=fd.get('expiry');
+      const cost=+fd.get('cost')||0;
+      S.logs.push({id:uid(),title:'ต่อ'+d.name,date:fd.get('date'),odo:0,cost,cat:CATS[2],shop:'',note:'',items:[]});
+      toast('ต่ออายุแล้ว');
+    });
+}
+function odoForm(){
+  openSheet('อัปเดตเลขไมล์',fld('เลขไมล์ปัจจุบัน (กม.)',inp('odo','',`type="number" inputmode="numeric" min="0" required placeholder="${curOdo()}"`)),
+    fd=>{const v=+fd.get('odo');if(v<curOdo()&&!confirm('เลขที่ใส่น้อยกว่าเลขไมล์ล่าสุด ต้องการแก้เป็นค่านี้ใช่ไหม'))return false;S.bike.odo=v;
+      if(v<curOdo()){toast('มีบันทึกน้ำมัน/ซ่อมที่เลขไมล์สูงกว่านี้ ให้แก้รายการนั้นแทน');return}
+      toast('อัปเดตแล้ว')});
+  setTimeout(()=>dlg.querySelector('[name=odo]').focus(),50);
+}
+function setupForm(){
+  openSheet('เริ่มต้นใช้งาน',
+    `<div class="hint">${ic('bike','sm')}<div>ตั้งค่ารถครั้งแรก รอบเปลี่ยนอะไหล่ตั้งไว้สำหรับ GPX Drone 150 แล้ว แก้ภายหลังได้ทุกค่า</div></div>
+     ${fld('ชื่อรถ',inp('name',S.bike.name,'required'))}
+     <div class="f2">${fld('ทะเบียน',inp('plate',S.bike.plate,'placeholder="ไม่บังคับ"'))}${fld('ปี',inp('year',S.bike.year,'type="number" inputmode="numeric"'))}</div>
+     ${fld('เลขไมล์ตอนนี้ (กม.)',inp('odo','','type="number" inputmode="numeric" min="0" required'))}
+     ${fld('เปลี่ยนน้ำมันเครื่องครั้งล่าสุดที่ (กม.)',inp('oilKm','','type="number" inputmode="numeric" min="0" placeholder="ไม่รู้ ปล่อยว่างได้"'))}
+     <div class="muted small">รายการที่ไม่ได้กรอก จะนับรอบใหม่จากเลขไมล์และวันนี้ แตะที่แต่ละรายการในหน้าบำรุงรักษาเพื่อแก้ให้ตรงได้</div>`,
+    fd=>{
+      const odo=+fd.get('odo'),t=today();
+      Object.assign(S.bike,{name:fd.get('name').trim(),plate:fd.get('plate').trim(),year:+fd.get('year')||'',odo});
+      S.items.forEach(it=>{it.lastKm=odo;it.lastDate=t});
+      const oil=fd.get('oilKm');if(oil!==''){const it=S.items.find(i=>i.icon==='oil');if(it)it.lastKm=Math.min(+oil,odo)}
+      S.setup=true;toast('พร้อมใช้งานแล้ว');
+    },{submit:'เริ่มใช้งาน'});
+}
+function settingsForm(){
+  const notifTxt=!('Notification' in window)?'อุปกรณ์นี้ไม่รองรับ':Notification.permission==='granted'?'เปิดอยู่':Notification.permission==='denied'?'ถูกบล็อก (เปิดได้ที่ตั้งค่าเว็บไซต์ของ Chrome)':'ยังไม่เปิด';
+  openSheet('ตั้งค่า',
+    `${fld('ชื่อรถ',inp('name',S.bike.name,'required'))}
+     <div class="f2">${fld('ทะเบียน',inp('plate',S.bike.plate))}${fld('ปี',inp('year',S.bike.year,'type="number"'))}</div>
+     <div class="f2">${fld('เตือนล่วงหน้า (กม.)',inp('warnKm',S.settings.warnKm,'type="number" min="0" required'))}${fld('เตือนล่วงหน้า (วัน)',inp('warnDays',S.settings.warnDays,'type="number" min="0" required'))}</div>
+     ${fld('เตือนเอกสารล่วงหน้า (วัน)',inp('docDays',S.settings.docDays,'type="number" min="0" required'))}
+     <div class="card" style="background:var(--bg);box-shadow:none">
+       <div class="row" style="margin-bottom:10px">${ic(user?'cloud':'cloudOff','sm')}<div style="flex:1;min-width:0">บัญชีคลาวด์<br><span class="small muted" style="word-break:break-all">${user?esc(user.email)+' · '+SYNC_TXT[syncState]:'ยังไม่ได้เข้าสู่ระบบ ข้อมูลอยู่ในเครื่องนี้เท่านั้น'}</span></div>
+       ${user?`<button type="button" class="btn sm" data-act="logout">ออกจากระบบ</button>`:`<button type="button" class="btn sm primary" data-act="login">เข้าสู่ระบบ</button>`}</div>
+       <div class="row" style="margin-bottom:10px">${ic('bell','sm')}<div style="flex:1">การแจ้งเตือน<br><span class="small muted">${notifTxt}</span></div>
+       ${'Notification' in window&&Notification.permission!=='denied'?`<button type="button" class="btn sm" data-act="notif">${Notification.permission==='granted'?'ทดสอบ':'เปิด'}</button>`:''}</div>
+       <div class="row" style="margin-bottom:10px">${ic('download','sm')}<div style="flex:1">สำรองข้อมูล<br><span class="small muted">บันทึกเป็นไฟล์ไว้ใน Drive/LINE กันข้อมูลหาย</span></div><button type="button" class="btn sm" data-act="export">สำรอง</button></div>
+       <div class="row">${ic('upload','sm')}<div style="flex:1">นำเข้าข้อมูล<br><span class="small muted">กู้คืนจากไฟล์สำรอง (จะแทนที่ข้อมูลเดิม)</span></div><button type="button" class="btn sm" data-act="import">นำเข้า</button></div>
+     </div>
+     <button type="button" class="btn danger block" data-act="reset">${ic('trash','sm')}ล้างข้อมูลทั้งหมด</button>
+     <div class="credit">ข้อมูลเก็บในเครื่องและซิงก์ขึ้น Supabase เมื่อเข้าสู่ระบบ · v1.1</div>`,
+    fd=>{
+      Object.assign(S.bike,{name:fd.get('name').trim(),plate:fd.get('plate').trim(),year:+fd.get('year')||''});
+      Object.assign(S.settings,{warnKm:+fd.get('warnKm'),warnDays:+fd.get('warnDays'),docDays:+fd.get('docDays')});
+      toast('บันทึกแล้ว');
+    });
+}
+
+/* ---------- Actions ---------- */
+const find=(arr,id)=>S[arr].find(x=>x.id===id);
+const del=(arr,id,msg)=>{if(!confirm(msg))return;S[arr]=S[arr].filter(x=>x.id!==id);dlg.close();save();render();toast('ลบแล้ว')};
+const ACT={
+  close:()=>dlg.close(),
+  odo:odoForm,settings:settingsForm,
+  addFuel:()=>fuelForm(),editFuel:id=>fuelForm(find('fuel',id)),delFuel:id=>del('fuel',id,'ลบรายการเติมน้ำมันนี้?'),
+  addLog:()=>logForm(),editLog:id=>logForm(find('logs',id)),delLog:id=>del('logs',id,'ลบรายการนี้?'),
+  addItem:()=>itemForm(),editItem:id=>itemForm(find('items',id)),delItem:id=>del('items',id,'ลบรายการบำรุงรักษานี้?'),
+  doneItem:id=>{const it=find('items',id);dlg.close();logForm(null,{title:'เปลี่ยน'+it.name.replace(/\s*\(.*\)/,''),items:[id]})},
+  addDoc:()=>docForm(),editDoc:id=>docForm(find('docs',id)),delDoc:id=>del('docs',id,'ลบเอกสารนี้?'),
+  renewDoc:id=>renewForm(find('docs',id)),
+  notif:enableNotif,
+  login:()=>loginForm(),toSignup:()=>loginForm('up'),toSignin:()=>loginForm('in'),
+  skipLogin:()=>{dlg.close();afterAuth()},
+  syncTap:()=>{if(!sb)return toast('เชื่อมต่อคลาวด์ไม่ได้ (ออฟไลน์?)');if(!user)return loginForm();S.dirty?push():pull();toast('กำลังซิงก์...')},
+  logout:async()=>{if(!confirm('ออกจากระบบ? ข้อมูลในเครื่องยังอยู่ แต่จะไม่ซิงก์จนกว่าจะเข้าสู่ระบบใหม่'))return;await sb.auth.signOut();user=null;setSync('off');dlg.close();render();toast('ออกจากระบบแล้ว')},
+  install:async()=>{if(!deferredInstall)return;deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;render()},
+  export:()=>{
+    const blob=new Blob([JSON.stringify(S,null,1)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`bikelog-backup-${today()}.json`;a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),2000);toast('ดาวน์โหลดไฟล์สำรองแล้ว');
+  },
+  import:()=>$('#importFile').click(),
+  reset:()=>{if(confirm('ล้างข้อมูลทั้งหมด ทั้งในเครื่องและบนคลาวด์? (กู้คืนไม่ได้ ถ้าไม่มีไฟล์สำรอง)')&&confirm('ยืนยันอีกครั้ง')){S=fresh();save();dlg.close();render();setupForm()}}
+};
+document.addEventListener('click',e=>{
+  const tb=e.target.closest('[data-tab]');if(tb){tab=tb.dataset.tab;render();return}
+  const t=e.target.closest('[data-act]');if(!t)return;
+  const f=ACT[t.dataset.act];if(f){e.preventDefault();f(t.dataset.id,t)}
+});
+$('#importFile').addEventListener('change',async e=>{
+  const file=e.target.files[0];e.target.value='';if(!file)return;
+  try{const d=JSON.parse(await file.text());if(!d.bike||!Array.isArray(d.items))throw 0;
+    if(!confirm(`นำเข้าข้อมูล "${d.bike.name}" แทนที่ข้อมูลปัจจุบัน?`))return;
+    S=Object.assign(fresh(),d);S.settings=Object.assign(fresh().settings,d.settings);save();dlg.close();render();toast('นำเข้าข้อมูลแล้ว');
+  }catch(err){toast('ไฟล์ไม่ถูกต้อง')}
+});
+
+/* ---------- PWA: ติดตั้ง / แจ้งเตือน ---------- */
+let deferredInstall=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;if(tab==='home')render()});
+window.addEventListener('appinstalled',()=>{deferredInstall=null;toast('ติดตั้งแล้ว')});
+
+function snapshot(){
+  if(!('caches' in window))return;
+  const s={warnKm:S.settings.warnKm,warnDays:S.settings.warnDays,docDays:S.settings.docDays,
+    dated:S.items.filter(i=>+i.months>0).map(i=>({name:i.name,due:addMonths(i.lastDate,+i.months)})),
+    km:S.items.filter(i=>+i.km>0).map(i=>({name:i.name,left:(+i.lastKm)+(+i.km)-curOdo()})),
+    docs:S.docs.filter(d=>d.expiry).map(d=>({name:d.name,due:d.expiry}))};
+  caches.open('bikelog-data').then(c=>c.put('due.json',new Response(JSON.stringify(s),{headers:{'Content-Type':'application/json'}}))).catch(()=>{});
+}
+async function showDue(force){
+  if(!('Notification' in window)||Notification.permission!=='granted'||!('serviceWorker' in navigator))return false;
+  const t=today();if(!force&&S.settings.notifiedOn===t)return false;
+  const a=alerts();
+  const reg=await navigator.serviceWorker.ready;
+  if(!a.length){if(force)reg.showNotification('สมุดดูแลรถ',{body:'การแจ้งเตือนทำงานแล้ว ตอนนี้ยังไม่มีรายการที่ถึงรอบ',icon:'icon-192.png',badge:'badge-96.png',tag:'due'});return true}
+  reg.showNotification(`มี ${a.length} รายการต้องดูแล`,{body:a.slice(0,5).map(x=>`• ${x.name}: ${x.text}`).join('\n'),icon:'icon-192.png',badge:'badge-96.png',tag:'due'});
+  S.settings.notifiedOn=t;persist();caches.open('bikelog-data').then(c=>c.put('notified-on',new Response(t))).catch(()=>{});return true;
+}
+async function enableNotif(){
+  if(!('Notification' in window))return toast('อุปกรณ์นี้ไม่รองรับการแจ้งเตือน');
+  const p=await Notification.requestPermission();
+  if(p!=='granted')return toast('ยังไม่ได้อนุญาตการแจ้งเตือน');
+  try{const reg=await navigator.serviceWorker.ready;
+    if('periodicSync' in reg){const st=await navigator.permissions.query({name:'periodic-background-sync'});if(st.state==='granted')await reg.periodicSync.register('due-check',{minInterval:12*3600*1000})}
+  }catch(e){}
+  await showDue(true);toast('เปิดการแจ้งเตือนแล้ว');if(dlg.open)dlg.close();render();
+}
+
+/* ---------- Supabase sync ---------- */
+const SUPA_URL='https://nzpxhocejalvbvtwttww.supabase.co';
+const SUPA_KEY='sb_publishable_XpK-uyHd7raqQ2uWf9ixNw_GULw9fIS'; // publishable key: ใช้ในเบราว์เซอร์ได้ ข้อมูลป้องกันด้วย RLS
+const TABLE='bikelog_state';
+let sb=null,user=null,syncState='off',pushT=null;
+const SYNC_TXT={ok:'ซิงก์แล้ว',syncing:'กำลังซิงก์...',offline:'ออฟไลน์ (จะซิงก์เมื่อมีเน็ต)',err:'ซิงก์ไม่สำเร็จ แตะเพื่อลองใหม่',off:'ไม่ได้เชื่อมคลาวด์'};
+function setSync(st){syncState=st;const b=$('#syncBtn');if(!b)return;b.className='hbtn sync '+st;b.innerHTML=ic(st==='ok'||st==='syncing'?'cloud':'cloudOff');b.title=SYNC_TXT[st]}
+async function initCloud(){
+  try{
+    const m=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+    sb=m.createClient(SUPA_URL,SUPA_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:'bikelog-auth'}});
+  }catch(e){setSync('offline');return afterAuth()}
+  const {data:{session}}=await sb.auth.getSession();
+  user=session?.user||null;
+  sb.auth.onAuthStateChange((ev,s)=>{const u=s?.user||null;if(u&&!user){user=u;setTimeout(()=>pull().then(()=>{render();afterAuth()}),0)}else user=u;if(!u)setSync('off')});
+  if(!user){if(!navigator.onLine)return afterAuth();return loginForm()}
+  await pull();render();afterAuth();
+}
+async function pull(){
+  if(!sb||!user)return setSync('off');
+  if(!navigator.onLine)return setSync('offline');
+  setSync('syncing');
+  const {data,error}=await sb.from(TABLE).select('data,updated_at').eq('user_id',user.id).maybeSingle();
+  if(error){console.warn(error);return setSync('err')}
+  const remoteT=data?Date.parse(data.updated_at):0,localT=S.updatedAt||0;
+  const localIsOther=S.owner&&S.owner!==user.id;
+  if(data&&(remoteT>localT||!S.setup||localIsOther)){
+    const keep=S.settings&&S.settings.notifiedOn;
+    S=Object.assign(fresh(),data.data,{dirty:false,owner:user.id,updatedAt:remoteT});
+    S.settings=Object.assign(fresh().settings,S.settings,{notifiedOn:keep||''});
+    persist();snapshot();render();return setSync('ok');
+  }
+  if(localIsOther){S=fresh();persist();render();return setSync('ok')}
+  if(S.setup&&(!data||localT>remoteT||S.dirty))return push();
+  setSync('ok');
+}
+function schedulePush(){if(!user)return;clearTimeout(pushT);pushT=setTimeout(push,1200)}
+async function push(){
+  if(!sb||!user)return;
+  if(!navigator.onLine)return setSync('offline');
+  setSync('syncing');
+  S.owner=user.id;
+  const {dirty,...payload}=S;
+  const {error}=await sb.from(TABLE).upsert({user_id:user.id,data:payload,updated_at:new Date(S.updatedAt||Date.now()).toISOString()});
+  if(error){console.warn(error);return setSync('err')}
+  S.dirty=false;persist();setSync('ok');
+}
+const AUTH_ERR={'Invalid login credentials':'อีเมลหรือรหัสผ่านไม่ถูกต้อง','Email not confirmed':'ยังไม่ได้ยืนยันอีเมล ให้กดลิงก์ในอีเมลก่อน','User already registered':'อีเมลนี้สมัครแล้ว ให้เข้าสู่ระบบแทน'};
+function loginForm(mode='in'){
+  const up=mode==='up';
+  openSheet(up?'สมัครบัญชี':'เข้าสู่ระบบ',
+    `<div class="hint">${ic('cloud','sm')}<div>ข้อมูลจะซิงก์เก็บบนคลาวด์ (Supabase) เปลี่ยนมือถือหรือล้างแอพ ข้อมูลก็ไม่หาย และเปิดดูได้หลายเครื่อง</div></div>
+     ${fld('อีเมล',inp('email','','type="email" required autocomplete="email" inputmode="email"'))}
+     ${fld('รหัสผ่าน'+(up?' (อย่างน้อย 6 ตัว)':''),inp('password','',`type="password" required minlength="6" autocomplete="${up?'new-password':'current-password'}"`))}
+     <div class="calc" id="authMsg" style="color:var(--red)"></div>
+     <button type="button" class="btn ghost block" data-act="${up?'toSignin':'toSignup'}">${up?'มีบัญชีแล้ว? เข้าสู่ระบบ':'ยังไม่มีบัญชี? สมัครใหม่'}</button>
+     <button type="button" class="btn ghost block" data-act="skipLogin" style="color:var(--muted)">ใช้แบบออฟไลน์ไปก่อน</button>`,
+    async fd=>{
+      if(!sb){$('#authMsg').textContent='เชื่อมต่อคลาวด์ไม่ได้ ตรวจสอบอินเทอร์เน็ต';return false}
+      const email=fd.get('email').trim(),password=fd.get('password');
+      $('#authMsg').style.color='var(--muted)';$('#authMsg').textContent='กำลังดำเนินการ...';
+      const res=up?await sb.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}}):await sb.auth.signInWithPassword({email,password});
+      if(res.error){$('#authMsg').style.color='var(--red)';$('#authMsg').textContent=AUTH_ERR[res.error.message]||res.error.message;return false}
+      if(up&&!res.data.session){$('#authMsg').style.color='var(--green)';$('#authMsg').textContent='ส่งลิงก์ยืนยันไปที่อีเมลแล้ว กดลิงก์ในอีเมล แล้วแอพจะเข้าสู่ระบบให้';return false}
+      user=res.data.user;await pull();toast('เข้าสู่ระบบแล้ว');setTimeout(afterAuth,60);return 'nosave';
+    },{submit:up?'สมัคร':'เข้าสู่ระบบ'});
+  dlg.dataset.login='1';
+}
+
+/* ---------- Start ---------- */
+$('#logo').innerHTML=ic('bike');$('#setBtn').innerHTML=ic('settings');$('#xBtn').innerHTML=ic('x','sm');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+const qa=new URLSearchParams(location.search).get('a');
+if(qa)history.replaceState(null,'',location.pathname+location.hash);
+let started=false;
+function afterAuth(){
+  if(started)return;started=true;
+  if(!S.setup)return setupForm();
+  showDue(false);if(qa==='fuel')fuelForm();else if(qa==='log')logForm();
+}
+render();snapshot();setSync('off');initCloud();
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){render();showDue(false);if(user)(S.dirty?push():pull())}});
+window.addEventListener('online',()=>{if(user)(S.dirty?push():pull())});
+window.addEventListener('offline',()=>{if(user)setSync('offline')});
+</script>
+</body>
+</html>
