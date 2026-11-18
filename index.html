@@ -133,6 +133,7 @@ dialog form{display:flex;flex-direction:column;max-height:92vh}
 .f .chips input{width:auto;padding:0;margin:0;accent-color:var(--navy)}
 .chips label{margin:0;color:var(--text)}
 .chips label:has(input:checked){border-color:var(--amber);background:var(--amber-soft)}
+.pw{position:relative}.f .pw input{padding-right:46px}.pw .eye{position:absolute;right:4px;top:50%;transform:translateY(-50%);border:0;background:none;width:38px;height:38px;display:grid;place-items:center;color:var(--muted);cursor:pointer}
 .calc{font-size:13px;color:var(--muted);margin:-4px 0 10px}
 
 .toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:20;max-width:90%}
@@ -203,6 +204,8 @@ const ICONS={
   cloud:"M7 18a4.5 4.5 0 1 1 .9-8.9A6 6 0 0 1 19 11a3.5 3.5 0 0 1-.5 7z",
   cloudOff:"M7 18a4.5 4.5 0 1 1 .9-8.9A6 6 0 0 1 19 11a3.5 3.5 0 0 1-.5 7zM3 3l18 18",
   logout:"M15 3h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-4M10 17l-5-5 5-5M5 12h11",
+  eye:"M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z",
+  eyeOff:"M2 12s3.5-7 10-7c2 0 3.7.6 5.1 1.5M22 12s-3.5 7-10 7c-2 0-3.7-.6-5.1-1.5M9.9 9.9a3 3 0 0 0 4.2 4.2M3 3l18 18",
   install:"M12 3v10M8 9l4 4 4-4M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"
 };
 const ic=(n,c='')=>`<svg class="ic ${c}" viewBox="0 0 24 24" aria-hidden="true"><path d="${ICONS[n]||ICONS.wrench}"/></svg>`;
@@ -562,7 +565,7 @@ function settingsForm(){
        <div class="row">${ic('upload','sm')}<div style="flex:1">นำเข้าข้อมูล<br><span class="small muted">กู้คืนจากไฟล์สำรอง (จะแทนที่ข้อมูลเดิม)</span></div><button type="button" class="btn sm" data-act="import">นำเข้า</button></div>
      </div>
      <button type="button" class="btn danger block" data-act="reset">${ic('trash','sm')}ล้างข้อมูลทั้งหมด</button>
-     <div class="credit">ข้อมูลเก็บในเครื่องและซิงก์ขึ้น Supabase เมื่อเข้าสู่ระบบ · v1.1.1</div>`,
+     <div class="credit">ข้อมูลเก็บในเครื่องและซิงก์ขึ้น Supabase เมื่อเข้าสู่ระบบ · v1.2</div>`,
     fd=>{
       Object.assign(S.bike,{name:fd.get('name').trim(),plate:fd.get('plate').trim(),year:+fd.get('year')||''});
       Object.assign(S.settings,{warnKm:+fd.get('warnKm'),warnDays:+fd.get('warnDays'),docDays:+fd.get('docDays')});
@@ -583,7 +586,8 @@ const ACT={
   addDoc:()=>docForm(),editDoc:id=>docForm(find('docs',id)),delDoc:id=>del('docs',id,'ลบเอกสารนี้?'),
   renewDoc:id=>renewForm(find('docs',id)),
   notif:enableNotif,
-  login:()=>loginForm(),toSignup:()=>loginForm('up'),toSignin:()=>loginForm('in'),
+  login:()=>loginForm(),toSignup:()=>loginForm('up',dlg.querySelector('[name=email]')?.value||''),toSignin:()=>loginForm('in',dlg.querySelector('[name=email]')?.value||''),toReset:()=>loginForm('reset',dlg.querySelector('[name=email]')?.value||''),
+  togglePw:(id,b)=>{const i=b.parentElement.querySelector('input');i.type=i.type==='password'?'text':'password';b.innerHTML=ic(i.type==='password'?'eye':'eyeOff','sm')},
   skipLogin:()=>{dlg.close();afterAuth()},
   syncTap:()=>{if(!sb)return toast('เชื่อมต่อคลาวด์ไม่ได้ (ออฟไลน์?)');if(!user)return loginForm();S.dirty?push():pull();toast('กำลังซิงก์...')},
   logout:async()=>{if(!confirm('ออกจากระบบ? ข้อมูลในเครื่องยังอยู่ แต่จะไม่ซิงก์จนกว่าจะเข้าสู่ระบบใหม่'))return;await sb.auth.signOut();user=null;setSync('off');dlg.close();render();toast('ออกจากระบบแล้ว')},
@@ -649,6 +653,7 @@ let sb=null,user=null,syncState='off',pushT=null;
 const SYNC_TXT={ok:'ซิงก์แล้ว',syncing:'กำลังซิงก์...',offline:'ออฟไลน์ (จะซิงก์เมื่อมีเน็ต)',err:'ซิงก์ไม่สำเร็จ แตะเพื่อลองใหม่',off:'ไม่ได้เชื่อมคลาวด์'};
 function setSync(st){syncState=st;const b=$('#syncBtn');if(!b)return;b.className='hbtn sync '+st;b.innerHTML=ic(st==='ok'||st==='syncing'?'cloud':'cloudOff');b.title=SYNC_TXT[st]}
 async function initCloud(){
+  const isRecovery=/type=recovery/.test(location.hash);
   try{
     const m=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
     sb=m.createClient(SUPA_URL,SUPA_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'implicit',storageKey:'bikelog-auth'}});
@@ -656,7 +661,10 @@ async function initCloud(){
   const {data:{session}}=await sb.auth.getSession();
   user=session?.user||null;
   sb.auth.onAuthStateChange((ev,s)=>{const u=s?.user||null;if(u&&!user){user=u;setTimeout(()=>pull().then(()=>{render();afterAuth()}),0)}else user=u;if(!u)setSync('off')});
-  if(!user){if(!navigator.onLine)return afterAuth();return loginForm()}
+  if(!user){
+    if(/error_code=otp_expired|error=access_denied/.test(location.hash)){history.replaceState(null,'',location.pathname);loginForm('reset');return authMsg('ลิงก์หมดอายุหรือถูกใช้ไปแล้ว ขอลิงก์ใหม่ได้ที่นี่')}
+    if(!navigator.onLine)return afterAuth();return loginForm()}
+  if(isRecovery)return newPassForm();
   await pull();render();afterAuth();
 }
 async function pull(){
@@ -688,26 +696,62 @@ async function push(){
   if(error){console.warn(error);return setSync('err')}
   S.dirty=false;persist();setSync('ok');
 }
-const AUTH_ERR={'Invalid login credentials':'อีเมลหรือรหัสผ่านไม่ถูกต้อง','Email not confirmed':'ยังไม่ได้ยืนยันอีเมล ให้กดลิงก์ในอีเมลก่อน','User already registered':'อีเมลนี้สมัครแล้ว ให้เข้าสู่ระบบแทน'};
-function loginForm(mode='in'){
-  const up=mode==='up';
-  openSheet(up?'สมัครบัญชี':'เข้าสู่ระบบ',
-    `<div class="hint">${ic('cloud','sm')}<div>ข้อมูลจะซิงก์เก็บบนคลาวด์ (Supabase) เปลี่ยนมือถือหรือล้างแอพ ข้อมูลก็ไม่หาย และเปิดดูได้หลายเครื่อง</div></div>
-     ${fld('อีเมล',inp('email','','type="email" required autocomplete="email" inputmode="email"'))}
-     ${fld('รหัสผ่าน'+(up?' (อย่างน้อย 6 ตัว)':''),inp('password','',`type="password" required minlength="6" autocomplete="${up?'new-password':'current-password'}"`))}
-     <div class="calc" id="authMsg" style="color:var(--red)"></div>
-     <button type="button" class="btn ghost block" data-act="${up?'toSignin':'toSignup'}">${up?'มีบัญชีแล้ว? เข้าสู่ระบบ':'ยังไม่มีบัญชี? สมัครใหม่'}</button>
+const AUTH_ERR={'New password should be different from the old password.':'รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสเดิม','Password should be at least 6 characters.':'รหัสผ่านต้องมีอย่างน้อย 6 ตัว','For security purposes, you can only request this after 60 seconds.':'ขอได้อีกครั้งหลัง 1 นาที','Email rate limit exceeded':'ส่งอีเมลบ่อยเกินไป รอสักครู่แล้วลองใหม่','email rate limit exceeded':'ส่งอีเมลบ่อยเกินไป รอสักครู่แล้วลองใหม่','Invalid login credentials':'อีเมลหรือรหัสผ่านไม่ถูกต้อง','Email not confirmed':'ยังไม่ได้ยืนยันอีเมล ให้กดลิงก์ในอีเมลก่อน','User already registered':'อีเมลนี้สมัครแล้ว ให้เข้าสู่ระบบแทน'};
+const pwField=(name,label,ac)=>`<div class="f"><label>${label}</label><div class="pw"><input name="${name}" type="password" required minlength="6" autocomplete="${ac}" autocapitalize="off" autocorrect="off" spellcheck="false"><button type="button" class="eye" data-act="togglePw" aria-label="แสดงรหัสผ่าน">${ic('eye','sm')}</button></div></div>`;
+const authMsg=(t,c='red')=>{const m=$('#authMsg');if(m){m.style.color=`var(--${c})`;m.textContent=t}};
+const authRedirect=()=>location.origin+location.pathname;
+function afterLogin(){toast('เข้าสู่ระบบแล้ว');setTimeout(()=>{if(started&&!S.setup&&!dlg.open)setupForm();else afterAuth()},60)}
+function loginForm(mode='in',email=''){
+  const up=mode==='up',reset=mode==='reset';
+  const title=up?'สมัครบัญชี':reset?'ลืมรหัสผ่าน':'เข้าสู่ระบบ';
+  openSheet(title,
+    `${reset?`<div class="hint">${ic('bell','sm')}<div>ใส่อีเมลที่ใช้สมัคร ระบบจะส่งลิงก์ไปให้ตั้งรหัสผ่านใหม่ กดลิงก์จากมือถือเครื่องนี้ได้เลย</div></div>`
+      :`<div class="hint">${ic('cloud','sm')}<div>ข้อมูลจะซิงก์เก็บบนคลาวด์ (Supabase) เปลี่ยนมือถือหรือล้างแอพ ข้อมูลก็ไม่หาย และเปิดดูได้หลายเครื่อง</div></div>`}
+     ${fld('อีเมล',inp('email',email,'type="email" required autocomplete="email" inputmode="email" autocapitalize="off"'))}
+     ${reset?'':pwField('password','รหัสผ่าน'+(up?' (อย่างน้อย 6 ตัว)':''),up?'new-password':'current-password')}
+     ${up?pwField('password2','พิมพ์รหัสผ่านอีกครั้ง','new-password'):''}
+     <div class="calc" id="authMsg"></div>
+     ${mode==='in'?`<button type="button" class="btn ghost block" data-act="toReset">ลืมรหัสผ่าน?</button>`:''}
+     <button type="button" class="btn ghost block" data-act="${up||reset?'toSignin':'toSignup'}">${up||reset?'กลับไปหน้าเข้าสู่ระบบ':'ยังไม่มีบัญชี? สมัครใหม่'}</button>
      <button type="button" class="btn ghost block" data-act="skipLogin" style="color:var(--muted)">ใช้แบบออฟไลน์ไปก่อน</button>`,
     async fd=>{
-      if(!sb){$('#authMsg').textContent='เชื่อมต่อคลาวด์ไม่ได้ ตรวจสอบอินเทอร์เน็ต';return false}
-      const email=fd.get('email').trim(),password=fd.get('password');
-      $('#authMsg').style.color='var(--muted)';$('#authMsg').textContent='กำลังดำเนินการ...';
-      const res=up?await sb.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}}):await sb.auth.signInWithPassword({email,password});
-      if(res.error){$('#authMsg').style.color='var(--red)';$('#authMsg').textContent=AUTH_ERR[res.error.message]||res.error.message;return false}
-      if(up&&!res.data.session){$('#authMsg').style.color='var(--green)';$('#authMsg').textContent='ส่งลิงก์ยืนยันไปที่อีเมลแล้ว กดลิงก์ในอีเมล แล้วแอพจะเข้าสู่ระบบให้';return false}
-      user=res.data.user;await pull();toast('เข้าสู่ระบบแล้ว');setTimeout(()=>{if(started&&!S.setup&&!dlg.open)setupForm();else afterAuth()},60);return 'nosave';
-    },{submit:up?'สมัคร':'เข้าสู่ระบบ'});
+      if(!sb){authMsg('เชื่อมต่อคลาวด์ไม่ได้ ตรวจสอบอินเทอร์เน็ต');return false}
+      const em=fd.get('email').trim().toLowerCase(),password=fd.get('password');
+      if(up&&password!==fd.get('password2')){authMsg('รหัสผ่านสองช่องไม่ตรงกัน');return false}
+      authMsg('กำลังดำเนินการ...','muted');
+      if(reset){
+        const {error}=await sb.auth.resetPasswordForEmail(em,{redirectTo:authRedirect()});
+        if(error){authMsg(AUTH_ERR[error.message]||error.message);return false}
+        authMsg('ส่งลิงก์ตั้งรหัสผ่านใหม่ไปที่อีเมลแล้ว (ถ้าไม่เห็นให้ดูในจดหมายขยะ)','green');return false;
+      }
+      const res=up?await sb.auth.signUp({email:em,password,options:{emailRedirectTo:authRedirect()}}):await sb.auth.signInWithPassword({email:em,password});
+      if(res.error){
+        const m=res.error.message;
+        if(m==='Email not confirmed'){
+          await sb.auth.resend({type:'signup',email:em,options:{emailRedirectTo:authRedirect()}});
+          authMsg('ยังไม่ได้ยืนยันอีเมล ส่งลิงก์ยืนยันให้ใหม่แล้ว กดลิงก์ในอีเมลก่อน');return false;
+        }
+        authMsg(m==='Invalid login credentials'?'อีเมลหรือรหัสผ่านไม่ถูกต้อง ลองกดรูปตาเพื่อดูรหัสที่พิมพ์ หรือกด "ลืมรหัสผ่าน?" เพื่อตั้งใหม่':(AUTH_ERR[m]||m));return false;
+      }
+      if(up&&!res.data.session){authMsg('ส่งลิงก์ยืนยันไปที่อีเมลแล้ว กดลิงก์ในอีเมล แล้วแอพจะเข้าสู่ระบบให้','green');return false}
+      user=res.data.user;await pull();afterLogin();return 'nosave';
+    },{submit:up?'สมัคร':reset?'ส่งลิงก์':'เข้าสู่ระบบ'});
   dlg.dataset.login='1';
+}
+function newPassForm(){
+  openSheet('ตั้งรหัสผ่านใหม่',
+    `<div class="hint">${ic('check','sm')}<div>ยืนยันตัวตนแล้ว ตั้งรหัสผ่านใหม่สำหรับ ${esc(user?.email||'')}</div></div>
+     ${pwField('password','รหัสผ่านใหม่ (อย่างน้อย 6 ตัว)','new-password')}
+     ${pwField('password2','พิมพ์รหัสผ่านใหม่อีกครั้ง','new-password')}
+     <div class="calc" id="authMsg"></div>`,
+    async fd=>{
+      const password=fd.get('password');
+      if(password!==fd.get('password2')){authMsg('รหัสผ่านสองช่องไม่ตรงกัน');return false}
+      authMsg('กำลังบันทึก...','muted');
+      const {error}=await sb.auth.updateUser({password});
+      if(error){authMsg(AUTH_ERR[error.message]||error.message);return false}
+      await pull();toast('ตั้งรหัสผ่านใหม่แล้ว');setTimeout(()=>{if(started&&!S.setup&&!dlg.open)setupForm();else afterAuth()},60);return 'nosave';
+    },{submit:'บันทึกรหัสผ่าน'});
 }
 
 /* ---------- Start ---------- */
