@@ -1,0 +1,21 @@
+{
+  "name": "สมุดดูแลรถ",
+  "short_name": "สมุดรถ",
+  "description": "บันทึกน้ำมัน รอบเปลี่ยนอะไหล่ ประวัติซ่อม และวันต่อ พ.ร.บ./ภาษี",
+  "lang": "th",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1E2A4A",
+  "theme_color": "#1E2A4A",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ],
+  "shortcuts": [
+    {"name": "เติมน้ำมัน", "url": "./?a=fuel", "icons": [{"src": "icon-192.png", "sizes": "192x192"}]},
+    {"name": "บันทึกซ่อม", "url": "./?a=log", "icons": [{"src": "icon-192.png", "sizes": "192x192"}]}
+  ]
+}
