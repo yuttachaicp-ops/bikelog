@@ -1,0 +1,33 @@
+name: Deploy to GitHub Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build site (convert SVG icons to PNG)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq librsvg2-bin
+          mkdir -p _site
+          cp index.html manifest.json sw.js _site/
+          rsvg-convert -w 192 -h 192 icon.svg -o _site/icon-192.png
+          rsvg-convert -w 512 -h 512 icon.svg -o _site/icon-512.png
+          rsvg-convert -w 512 -h 512 icon-maskable.svg -o _site/maskable-512.png
+          rsvg-convert -w 96 -h 96 badge.svg -o _site/badge-96.png
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+      - id: deployment
+        uses: actions/deploy-pages@v4
