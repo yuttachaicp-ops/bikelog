@@ -1,5 +1,5 @@
 // Service worker: ใช้งานออฟไลน์ + แจ้งเตือนเบื้องหลัง
-const VERSION = 'bikelog-v1.1.0';
+const VERSION = 'bikelog-v1.1.1';
 const SHELL = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png', 'badge-96.png'];
 
 self.addEventListener('install', e => {
